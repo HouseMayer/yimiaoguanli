@@ -37,15 +37,15 @@
         </div>
         <!-- 对话框 -->
         <el-dialog :visible.sync="dialogVisible" title="注册账号" width="30%">
-            <el-form :model="form" label-width="120px">
-                <!-- ref="form" :rules="registerRules"  -->
-                <el-form-item label="姓名" prop="registrname">
+            <el-form :model="form" :rules="registerRules" label-width="120px">
+                <!-- ref="form"   -->
+                <el-form-item label="姓名" prop="name">
                     <el-input v-model="form.name" style="width: 80%"></el-input>
                 </el-form-item>
-                <el-form-item label="手机号码" prop="registerphone">
+                <el-form-item label="手机号码" prop="phone">
                     <el-input v-model="form.phone" style="width: 80%"></el-input>
                 </el-form-item>
-                <el-form-item label="密码" prop="registerpassword">
+                <el-form-item label="密码" prop="password">
                     <el-input v-model="form.password" style="width: 80%"></el-input>
                 </el-form-item>
                 <el-form-item label="头像">
@@ -56,20 +56,20 @@
                         <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                     </el-upload>
                 </el-form-item>
-                <el-form-item label="身份证号" prop="registeridcard">
+                <el-form-item label="身份证号" prop="code">
                     <el-input v-model="form.code" style="width: 80%"></el-input>
                 </el-form-item>
-                <el-form-item label="邮箱" prop="registeremail">
+                <el-form-item label="邮箱" prop="email">
                     <el-input v-model="form.email" style="width: 80%"></el-input>
                 </el-form-item>
-                <el-form-item label="性别" prop="registrsex">
+                <el-form-item label="性别" prop="sex">
                     <el-radio v-model="form.sex" label="男">男</el-radio>
                     <el-radio v-model="form.sex" label="女">女</el-radio>
                 </el-form-item>
-                <el-form-item label="年龄" prop="registrage">
+                <el-form-item label="年龄" prop="age">
                     <el-input v-model="form.age" style="width: 80%"></el-input>
                 </el-form-item>
-                <el-form-item label="职业" prop="registrjob">
+                <el-form-item label="职业" prop="job">
                     <el-input v-model="form.job" style="width: 80%"></el-input>
                 </el-form-item>
             </el-form>
@@ -90,7 +90,59 @@ import router from "@/router";
 
 export default {
     name: "Login",
+
     data() {
+        var checkName = (rule, value, callback) => {
+            if (!value) {
+                return callback(new Error('姓名不能为空!!'));
+            }
+            callback();
+        };
+        var checkPhone = (rule, value, callback) => {
+            if (!value) {
+                return callback(new Error('手机号码不能为空!!'));
+            }
+            callback();
+        };
+        var checkPassword = (rule, value, callback) => {
+            if (!value) {
+                return callback(new Error('密码不能为空!!'));
+            }
+            callback();
+        };
+        var validateEmail = (rule, value, callback) => {
+            const emailReg = /^(([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5}){1,25})$/
+            if (!value) {
+                return callback(new Error('邮箱不能为空!!'))
+            }
+            if (!emailReg.test(value)) {
+                return callback(new Error('邮箱格式错误!!'))
+            } else {
+                callback()
+            }
+        };
+        var checkAge = (rule, value, callback) => {
+            if (!value) {
+                return callback(new Error('年龄不能为空!!'));
+            }
+            setTimeout(() => {
+                if (!Number.isInteger(value)) {
+                    callback(new Error('请输入数字值!!'));
+                } else {
+                    if (value < 18) {
+                        callback(new Error('必须年满18岁!!'));
+                    } else {
+                        callback();
+                    }
+                }
+            }, 1000);
+        };
+        var checkCode = (rule, value, callback) => {
+            if (!value) {
+                return callback(new Error('身份证不能为空!!'));
+            }
+            callback();
+        };
         return {
 
 
@@ -111,21 +163,30 @@ export default {
                 age: "",
                 job: "",
             },
-            // registerRules: {
-            //     registername: [
-            //         { require: true, trigger: blur, message: "姓名不能为空" },
-            //         { min: 2, max: 12, message: "姓名必须在2~12字之间" }
-            //     ],
-            //     registeremail: [
-            //         { type: 'email', message: '请输入正确的邮箱地址', trigger: 'change' }
-            //     ],
-            //     registerage: [
-            //         { required: true, message: '年龄不能为空' },
-            //         { type: 'number', message: '年龄必须为数字值' },
-            //         { min: 1, message: '年龄必须大于0' }
-            //     ],
-
-            // },
+            registerRules: {
+                name: [
+                    { required: true, validator: checkName, trigger: 'blur' }
+                ],
+                phone: [
+                    { required: true, validator: checkPhone, trigger: 'blur' }
+                ],
+                password: [
+                    { required: true, validator: checkPassword, trigger: 'blur' }
+                ],
+                email: [
+                    { required: true, validator: validateEmail, trigger: 'blur' }
+                ],
+                password: [
+                    { required: true, validator: checkPassword, trigger: 'blur' }
+                ],
+                age: [
+                    { required: true, validator: checkAge, trigger: 'blur' }
+                ],
+                code: [
+                    { required: true, validator: checkCode, trigger: 'blur' }
+                ],
+               
+            },
             imageUrl: "",
             loading: false,
             dialogVisible: false,
@@ -164,8 +225,8 @@ export default {
             const isJPG = file.type === "image/jpeg";
             const isPNG = file.type === "image/png";
             const isLt2M = file.size / 1024 / 1024 < 2;
-            if (!isJPG) {
-                this.$message.error("上传头像图片只能是 JPG 格式!");
+            if (!isJPG  && !isPNG ) {
+                this.$message.error("上传头像图片只能是 JPG 或 PNG 格式!");
             }
             if (!isLt2M) {
                 this.$message.error("上传头像图片大小不能超过 2MB!");

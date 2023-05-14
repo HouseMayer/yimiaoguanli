@@ -54,8 +54,6 @@ public class UserController {
         return objectMapper.writeValueAsString(result);
     }
 
-
-
     @RequestMapping("delete")
     public String delete(Integer id) throws JsonProcessingException {
 
@@ -142,11 +140,8 @@ public class UserController {
 
         int num = userService.count(queryWrapperuery.eq("phone", phone));
 //        List<String> list = userService.get();
-        if (num > 0){
-            result.put("ok", false);
-        }else {
-            result.put("ok", true);
-        }
+            result.put("exits", num > 0);
+
         // 转换为json写出
         return objectMapper.writeValueAsString(result);
     }

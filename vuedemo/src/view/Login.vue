@@ -99,10 +99,28 @@ export default {
             callback();
         };
         var checkPhone = (rule, value, callback) => {
+
             if (!value) {
                 return callback(new Error('手机号码不能为空!!'));
             }
-            callback();
+
+            //发起请求
+            request
+                .get("/gec/user/queryPhone", {
+                    params: {
+                        phone: value,
+                    },
+                })
+                .then((res) => {
+                    //当手机号码存在
+                    if (res.exits == true) {
+                        callback(new Error("手机号码已经存在!!"));
+                    } else {
+                        callback();
+                    }
+                });
+
+
         };
         var checkPassword = (rule, value, callback) => {
             if (!value) {
@@ -123,19 +141,16 @@ export default {
         };
         var checkAge = (rule, value, callback) => {
             if (!value) {
-                return callback(new Error('年龄不能为空!!'));
+                return callback(new Error('年龄不能为空'));
             }
-            setTimeout(() => {
-                if (!Number.isInteger(value)) {
-                    callback(new Error('请输入数字值!!'));
+            let reg = /^(?:[1-9][0-9]?|1[0-4][0-9]|150)$/;//年龄是1-150之间有效
+            if (value && value.length > 0) {
+                if (!reg.test(value)) {
+                    callback([new Error('年龄输入必须是在0-150之间的整数!!')]);
                 } else {
-                    if (value < 18) {
-                        callback(new Error('必须年满18岁!!'));
-                    } else {
-                        callback();
-                    }
+                    callback();
                 }
-            }, 1000);
+            }
         };
         var checkCode = (rule, value, callback) => {
             if (!value) {
@@ -185,7 +200,7 @@ export default {
                 code: [
                     { required: true, validator: checkCode, trigger: 'blur' }
                 ],
-               
+
             },
             imageUrl: "",
             loading: false,
@@ -225,7 +240,7 @@ export default {
             const isJPG = file.type === "image/jpeg";
             const isPNG = file.type === "image/png";
             const isLt2M = file.size / 1024 / 1024 < 2;
-            if (!isJPG  && !isPNG ) {
+            if (!isJPG && !isPNG) {
                 this.$message.error("上传头像图片只能是 JPG 或 PNG 格式!");
             }
             if (!isLt2M) {

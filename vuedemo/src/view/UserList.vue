@@ -49,7 +49,7 @@
             <el-table-column prop="phone" label="手机号码"> </el-table-column>
             <el-table-column prop="image" label="头像" width="150">
                 <template slot-scope="scope">
-                    <img :src="scope.row.image" style="width: 100px; height: 80px" />
+                    <img :src="scope.row.image" style="width: 100px; height: 100px" />
                 </template>
             </el-table-column>
             <el-table-column prop="password" label="密码"> </el-table-column>
@@ -121,71 +121,97 @@ export default {
                 age: '',
                 job: '',
                 status: '',
-            
-        },
+
+            },
             formLabelWidth: '120px',
 
 
         };
-},
-//created页面加载完触发的生命周期
-created() {
-    this.query();
-
-},
-
-
-methods: {
-
-    //成功后的处理函数
-    handleAvatarSuccess(res, file) {
-        console.log("file===" + file);
-        this.imageUrl = URL.createObjectURL(file.raw);
-        this.form.image = res;
     },
-    //上传之前的处理函数
-    beforeAvatarUpload(file) {
-        const isJPG = file.type === "image/jpeg";
-        const isPNG = file.type === "image/png";
-        const isLt2M = file.size / 1024 / 1024 < 2;
-        if (!isJPG) {
-            this.$message.error("上传头像图片只能是 JPG 格式!");
-        }
-        if (!isLt2M) {
-            this.$message.error("上传头像图片大小不能超过 2MB!");
-        }
-        console.log("isJPG===" + ((isJPG || isPNG) && isLt2M));
-        return (isJPG || isPNG) && isLt2M;
+    //created页面加载完触发的生命周期
+    created() {
+        this.query();
+
     },
 
-    // 重载方法
-    query() {
-        //发起一个异步请求，查询分类的数据
-        request
-            // get表示指定请求地址 和 请求参数
-            .get("/gec/user/listInfo2", {
-                params: {
-                    pageNum: this.pageNum,
-                    pageSize: this.pageSize,
-                    keyWord: this.keyword,
-                },
-            })
-            // then表示请求后的回调函数
-            .then((res) => {
-                console.log(res);
-                // 把后台的响应的数据赋值给data中的tableData
-                this.tableData = res.list;
 
-                this.total = res.total;
-            });
-    },
-    handleClose() {
-        this.$confirm('是否退出?', '提示', {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            type: 'warning'
-        }).then(() => {
-            this.dialogVisible = false;
+    methods: {
+         //上传之前的处理函数
+         beforeAvatarUpload(file) {
+            const isJPG = file.type === "image/jpeg";
+            const isPNG = file.type === "image/png";
+            const isLt2M = file.size / 1024 / 1024 < 2;
+            if (!isJPG && !isPNG) {
+                this.$message.error("上传头像图片只能是 JPG 或者 PNG 格式!");
+            }
+            if (!isLt2M) {
+                this.$message.error("上传头像图片大小不能超过 2MB!");
+            }
+            console.log("isJPG===" + ((isJPG || isPNG) && isLt2M));
+            return (isJPG || isPNG) && isLt2M;
+        },
+
+        //成功后的处理函数
+        handleAvatarSuccess(res, file) {
+            console.log("file===" + file);
+            this.imageUrl = URL.createObjectURL(file.raw);
+            // 把上传图片的url set到form中
+            this.form.image = res;  
+        },
+       
+
+
+        // 重载方法
+        query() {
+            //发起一个异步请求，查询分类的数据
+            request
+                // get表示指定请求地址 和 请求参数
+                .get("/gec/user/listInfo2", {
+                    params: {
+                        pageNum: this.pageNum,
+                        pageSize: this.pageSize,
+                        keyWord: this.keyword,
+                    },
+                })
+                // then表示请求后的回调函数
+                .then((res) => {
+                    console.log(res);
+                    // 把后台的响应的数据赋值给data中的tableData
+                    this.tableData = res.list;
+                    // 将res.total赋值给total
+                    this.total = res.total;
+                });
+        },
+        handleClose() {
+            this.$confirm('是否退出?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                this.dialogVisible = false;
+                this.form = {
+                    id: '',
+                    name: '',
+                    phone: '',
+                    image: '',
+                    password: '',
+                    role: '',
+                    userId: '',
+                    code: '',
+                    email: '',
+                    sex: '',
+                    age: '',
+                    job: '',
+                    status: '',
+
+
+                };
+                this.imageUrl = "";
+            }).catch(() => { }
+            );
+        },
+
+        handleCloseAfter() {
             this.form = {
                 id: '',
                 name: '',
@@ -200,181 +226,163 @@ methods: {
                 age: '',
                 job: '',
                 status: '',
-
-
             };
             this.imageUrl = "";
-        }).catch(() => { }
-        );
-    },
+            this.dialogVisible = false;
+        },
+        save() {
+            console.log(this.form);
+            //id为空，则是做新增操作
+            if (this.form.id == "") {
+                request
+                //发起post异步请求、提交数据
+                    .post("/gec/user/insert", this.form)
+                    .then((res) => {
+                        if (res.ok == true) {
+                            this.$message({
+                                type: 'success',
+                                message: '新增成功!'
+                            });
+                            //关闭对话框
+                            this.dialogVisible = false;
+                            //重新加载数据
+                            this.query();
+                        } else {
 
-    handleCloseAfter() {
-        this.form = {
-            id: '',
-            name: '',
-            phone: '',
-            image: '',
-            password: '',
-            role: '',
-            userId: '',
-            code: '',
-            email: '',
-            sex: '',
-            age: '',
-            job: '',
-            status: '',
-        };
-        this.imageUrl = "";
-        this.dialogVisible = false;
-    },
-    save() {
-        console.log(this.form);
-
-        if (this.form.id == "") {
-            
-            request
-                .post("/gec/user/insert", this.form)
-                .then((res) => {
-                    if (res.ok == true) {
-                        this.$message({
-                            type: 'success',
-                            message: '新增成功!'
-                        });
-                        this.dialogVisible = false;
-                        this.form = {
-                            id: '',
-                            name: '',
-                            phone: '',
-                            image: '',
-                            password: '',
-                            role: '',
-                            userId: '',
-                            code: '',
-                            email: '',
-                            sex: '',
-                            age: '',
-                            job: '',
-                            status: '',
-                            
-                        };
+                            this.$message({
+                                type: 'error',
+                                message: '新增失败!'
+                            });
+                        }
                         this.imageUrl = "";
-                        this.query();
-                    } else {
-                        
-                        this.$message({
-                            type: 'error',
-                            message: '新增失败!'
-                        });
-                    }
-                });
-        } else {
-            this.form.image =this.imageUrl;
-            request
-                .post("/gec/user/update", this.form)
-                .then((res) => {
-                    if (res.ok == true) {
-                        this.$message({
-                            type: 'success',
-                            message: '修改成功!'
-                        });
-                        this.dialogVisible = false;
                         this.form = {
-                            id: '',
-                            name: '',
-                            phone: '',
-                            image: '',
-                            password: '',
-                            role: '',
-                            userId: '',
-                            code: '',
-                            email: '',
-                            sex: '',
-                            age: '',
-                            job: '',
-                            status: '',
+                                id: '',
+                                name: '',
+                                phone: '',
+                                image: '',
+                                password: '',
+                                role: '',
+                                userId: '',
+                                code: '',
+                                email: '',
+                                sex: '',
+                                age: '',
+                                job: '',
+                                status: '',
 
-                        };
-                        this.query();
-                    } else {
-                        this.$message({
-                            type: 'error',
-                            message: '修改失败!'
-                        });
-                    }
+                            };
+                    });
+            } else {
+                //id不为空，则是做修改操作
+                request
+                    .post("/gec/user/update", this.form)
+                    .then((res) => {
+                        if (res.ok == true) {
+                            this.$message({
+                                type: 'success',
+                                message: '修改成功!'
+                            });
+                            //关闭对话框
+                            this.dialogVisible = false;
+                            //重新加载数据
+                            this.query();
+                        } else {
+                            this.$message({
+                                type: 'error',
+                                message: '修改失败!'
+                            });
+                        }
+                         imageUrl = "";
+                         this.form = {
+                                id: '',
+                                name: '',
+                                phone: '',
+                                image: '',
+                                password: '',
+                                role: '',
+                                userId: '',
+                                code: '',
+                                email: '',
+                                sex: '',
+                                age: '',
+                                job: '',
+                                status: '',
+
+                            };
+                    });
+
+            }
+
+        },
+
+        handleEdit(row) {
+            console.log(row);
+            this.dialogVisible = true;
+            this.imageUrl = row.image;
+            this.form.id = row.id;
+            this.form.name = row.name;
+            this.form.phone = row.phone;
+            this.form.image = row.imageUrl;
+            this.form.password = row.password;
+            this.form.role = row.role;
+
+
+            // this.form = row;
+        },
+
+        //删除方法
+        handleDelete(index, row) {
+
+            this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+
+                //删除操作
+                request
+                    .get("/gec/user/delete", {
+                        params: { id: row.id },
+                    })
+                    .then((res) => {
+                        if (res.ok == true) {
+                            this.$message({
+                                type: 'success',
+                                message: '删除成功!'
+                            });
+                            this.query();
+                        } else {
+                            this.$message({
+                                type: 'error',
+                                message: '删除失败!'
+                            });
+                        }
+                    });
+
+            }).catch(() => {
+                this.$message({
+                    type: 'info',
+                    message: '已取消删除'
                 });
+            });
+        },
 
+        //修改单页数据数量
+        handleSizeChange(val) {
+            this.pageNum = 1;
+            this.pageSize = val;
+            this.query();
+        },
+        //跳转页码
+        handleCurrentChange(val) {
+            console.log(val);
+            this.pageNum = val;
+            this.query();
         }
 
+
+
     },
-
-    handleEdit(row) {
-        console.log(row);
-        this.dialogVisible = true;
-        this.imageUrl = row.image;
-        this.form.id = row.id;
-        this.form.name = row.name;
-        this.form.phone = row.phone;
-        this.form.image = row.imageUrl;
-        this.form.password = row.password;
-        this.form.role = row.role;
-
-
-        // this.form = row;
-    },
-
-    //删除方法
-    handleDelete(index, row) {
-
-        this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            type: 'warning'
-        }).then(() => {
-
-            //删除操作
-            request
-                .get("/gec/user/delete", {
-                    params: { id: row.id },
-                })
-                .then((res) => {
-                    if (res.ok == true) {
-                        this.$message({
-                            type: 'success',
-                            message: '删除成功!'
-                        });
-                        this.query();
-                    } else {
-                        this.$message({
-                            type: 'error',
-                            message: '删除失败!'
-                        });
-                    }
-                });
-
-        }).catch(() => {
-            this.$message({
-                type: 'info',
-                message: '已取消删除'
-            });
-        });
-    },
-
-    //修改单页数据数量
-    handleSizeChange(val) {
-        this.pageNum = 1;
-        this.pageSize = val;
-        this.query();
-    },
-    //跳转页码
-    handleCurrentChange(val) {
-        console.log(val);
-        this.pageNum = val;
-        this.query();
-    }
-
-
-
-},
 };
 </script>
 <style>

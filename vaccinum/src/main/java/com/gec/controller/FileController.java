@@ -1,5 +1,6 @@
 package com.gec.controller;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -11,6 +12,9 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/file")
 public class FileController {
+
+    @Value("${work.path}")
+    private String basePath;
 
     //测试上传操作请求
     @RequestMapping("/upload")
@@ -24,10 +28,12 @@ public class FileController {
         //拼接uuid和后缀名
         fileName = uuid + subfix;
         System.out.println("文件名：" + fileName);
-        //文件上传
+
+        //文件上传【写入到硬盘中】
         file.transferTo(new File("C:\\Work\\WorkSpace\\IDEA WorkSpace\\shixun\\file\\" + fileName));
         // 返回图片访问的url
         return "http://localhost:8088/" + fileName;
     }
+
 
 }

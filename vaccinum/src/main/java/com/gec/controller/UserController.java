@@ -112,17 +112,17 @@ public class UserController {
 
     @RequestMapping("update")
     public String update(User user) throws JsonProcessingException {
-
+        //JSON解析工具
         ObjectMapper objectMapper = new ObjectMapper();
-
+        //定义map集合
         HashMap result = new HashMap();
-
-        boolean ok = userService.updateById(user);
-
-
-        result.put("ok", ok);
-
-
+        //查询构造条件
+        System.out.println(user);
+        boolean save1 = userService.updateById(user);
+        System.out.println(user);
+        //保存在map中
+        result.put("ok", save1);
+        // 转换为json写出
         return objectMapper.writeValueAsString(result);
     }
 

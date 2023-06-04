@@ -152,22 +152,18 @@ public class UserInfoController {
     }
 
     @RequestMapping("update")
-    public String update(User user, UserInfo userInfo) throws JsonProcessingException {
-
+    public String update(UserInfo userInfo, User user) throws JsonProcessingException {
+        //JSON解析工具
         ObjectMapper objectMapper = new ObjectMapper();
-
+        //定义map集合
         HashMap result = new HashMap();
-
-        boolean ok1 = userService.updateById(user);
-
-        boolean ok = userInfoService.updateById(userInfo);
-
-
-
-
-        result.put("ok", ok&&ok1);
-
-
+        //查询构造条件
+        boolean save1 = userService.updateById(user);
+        userInfo.setUserId(user.getId());
+        boolean save2 = userInfoService.updateById(userInfo);
+        //保存在map中
+        result.put("ok", save1 && save2);
+        // 转换为json写出
         return objectMapper.writeValueAsString(result);
     }
 

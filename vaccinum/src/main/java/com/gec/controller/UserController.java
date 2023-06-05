@@ -87,9 +87,9 @@ public class UserController {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         // 成立的表达式  字段名  数值
         //角色限制+
-        queryWrapper.like(keyWord != null && !keyWord.equals(""), "name", keyWord);
         queryWrapper.notIn("role", 0);
         //LIKE
+        queryWrapper.like(keyWord != null && !keyWord.equals(""), "name", keyWord);
 
         /*分页构造函数
         Params:

@@ -104,14 +104,21 @@ public class UserInfoController {
         ObjectMapper objectMapper = new ObjectMapper();
         //定义map集合
         HashMap result = new HashMap();
-        //使用业务层来查询数据【查询所有】
-        //Page<VaccinumType> page= typeService.page(new Page<>(pageNum,pageSize));
+
         QueryWrapper<UserInfo> queryWrapper = new QueryWrapper<>();
-        queryWrapper.like( !keyWord.equals("")&&keyWord!=null ,"name" , keyWord);
+
+        queryWrapper.like( !keyWord.equals("")&&keyWord!=null ,"code" , keyWord);
 
 
+
+
+        //使用业务层来查询数据【查询所有】
+        /* 分页构造函数
+         * Params:
+         * current – 当前页
+         * size – 每页显示条数
+         */
         Page<UserInfo> page= userInfoService.page(new Page<>(pageNum,pageSize), queryWrapper);
-
         page.getRecords().forEach(en -> {
             //根据id获取到分类的对象数据
             User user = userService.getById(en.getUserId());
@@ -120,8 +127,8 @@ public class UserInfoController {
             en.setUserName(user.getName());
         });
 
-
         List<UserInfo> list = page.getRecords();
+
         result.put("list", list);
         result.put("total", page.getTotal());
         // 转换为json写出

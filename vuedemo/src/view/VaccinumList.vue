@@ -2,7 +2,7 @@
     <div>
         <div style="margin: 20px 0px;">
             <!-- input -->
-            <el-input placeholder="请输入内容" v-model="keyword" clearable style="width: 20%;"> </el-input>
+            <el-input placeholder="请输入疫苗名称进行搜索" v-model="keyword" clearable style="width: 20%;"> </el-input>
             <!-- 模糊搜索功能 -->
             <el-button type="primary" @click="query">搜索</el-button>
 

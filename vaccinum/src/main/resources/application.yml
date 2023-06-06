@@ -1,3 +1,18 @@
+server:
+  port: 8088
+  tomcat:
+    uri-encoding: UTF-8
+  servlet:
+    encoding:
+      charset: UTF-8
+    multipart:
+      enabled: true # 开启文件上传
+      file-size-threshold: 2KB # 文件写入磁盘的阈值
+      max-file-size: 100MB
+      max-request-size: 215MB # 最大请求值大小
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -7,13 +22,6 @@ spring:
   web:
     resources:
       static-locations: file:C:\Work\WorkSpace\IDEA WorkSpace\shixun\file,classpath:/META-INF/resources/, classpath:/resources/, classpath:/static/, classpath:/templates/, classpath:/public/
-server:
-  port: 8088
-  tomcat:
-    uri-encoding: UTF-8
-  servlet:
-    encoding:
-      charset: UTF-8
-mybatis-plus:
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+work:
+  path: C:\Work\WorkSpace\IDEA WorkSpace\shixun\file

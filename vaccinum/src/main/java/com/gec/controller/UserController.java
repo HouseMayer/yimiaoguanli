@@ -76,7 +76,7 @@ public class UserController {
     @RequestMapping("listInfo2")
     public String listInfo2(@RequestParam(required = true, defaultValue = "1") Integer pageNum,
                             @RequestParam(required = true, defaultValue = "3") Integer pageSize,
-                            @RequestParam(required = false) String keyword
+                            @RequestParam(required = false) String keyWord
     ) throws JsonProcessingException {
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -86,10 +86,11 @@ public class UserController {
         //查询构造条件
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         // 成立的表达式  字段名  数值
-        //角色限制
+        //角色限制+
         queryWrapper.notIn("role", 0);
         //LIKE
-        queryWrapper.like(keyword != null && !keyword.equals(""), "name", keyword);
+        queryWrapper.like(keyWord != null && !keyWord.equals(""), "name", keyWord);
+
         /*分页构造函数
         Params:
         current – 当前页
@@ -112,17 +113,17 @@ public class UserController {
 
     @RequestMapping("update")
     public String update(User user) throws JsonProcessingException {
-
+        //JSON解析工具
         ObjectMapper objectMapper = new ObjectMapper();
-
+        //定义map集合
         HashMap result = new HashMap();
+        //查询构造条件
 
-        boolean ok = userService.updateById(user);
-
-
-        result.put("ok", ok);
-
-
+        boolean save1 = userService.updateById(user);
+        System.out.println(user);
+        //保存在map中
+        result.put("ok", save1);
+        // 转换为json写出
         return objectMapper.writeValueAsString(result);
     }
 
